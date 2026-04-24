@@ -1,0 +1,104 @@
+{
+  "nav": {
+    "home": "Главная",
+    "servers": "Серверы",
+    "settings": "Настройки"
+  },
+  "auth": {
+    "loginTitle": "Вход",
+    "loginSubtitle": "Войдите, чтобы управлять VPN",
+    "registerTitle": "Регистрация",
+    "registerSubtitle": "Создай аккаунт SecureVPN",
+    "email": "Email",
+    "password": "Пароль",
+    "confirmPassword": "Повтори пароль",
+    "signIn": "Войти",
+    "signUp": "Зарегистрироваться",
+    "noAccount": "Нет аккаунта? Регистрация",
+    "haveAccount": "Уже есть аккаунт? Войти",
+    "fillEmailPassword": "Заполни email и пароль",
+    "fillAllFields": "Заполни все поля",
+    "passwordMismatch": "Пароли не совпадают",
+    "errorLogin": "Ошибка входа",
+    "errorRegister": "Ошибка регистрации"
+  },
+  "main": {
+    "connecting": "Подключение...",
+    "protected": "Защищено",
+    "notProtected": "Не защищено",
+    "vpnOn": "VPN Активен",
+    "vpnOff": "VPN Выкл",
+    "connectionStatus": "Статус соединения",
+    "connected": "Подключено",
+    "disconnected": "Отключено",
+    "connect": "Подключить",
+    "disconnect": "Отключить",
+    "currentServer": "Текущий сервер",
+    "serverFrankfurt": "Франкфурт, Германия"
+  },
+  "servers": {
+    "title": "Выбор сервера",
+    "searchPlaceholder": "Поиск по стране или городу...",
+    "premium": "Премиум",
+    "ping": "{{ms}} мс",
+    "frankfurt": {
+      "city": "Франкфурт",
+      "country": "Германия"
+    },
+    "newyork": {
+      "city": "Нью-Йорк",
+      "country": "США"
+    },
+    "london": {
+      "city": "Лондон",
+      "country": "Великобритания"
+    },
+    "tokyo": {
+      "city": "Токио",
+      "country": "Япония"
+    },
+    "paris": {
+      "city": "Париж",
+      "country": "Франция"
+    },
+    "singapore": {
+      "city": "Сингапур",
+      "country": "Сингапур"
+    }
+  },
+  "premium": {
+    "title": "VPN Премиум",
+    "plan1m": "1 месяц",
+    "plan6m": "6 месяцев",
+    "plan12m": "12 месяцев",
+    "perMonth1": "12.99$/мес",
+    "perMonth6": "9.99$/мес",
+    "perMonth12": "7.49$/мес",
+    "savings23": "Скидка 23%",
+    "savings42": "Скидка 42%",
+    "feat1": "Безлимитный трафик",
+    "feat2": "Доступ ко всем серверам",
+    "feat3": "Приоритетная поддержка",
+    "feat4": "До 10 устройств одновременно",
+    "cta": "Начать 7-дневный пробный период"
+  },
+  "settings": {
+    "title": "Настройки",
+    "subtitle": "Управление аккаунтом и приложением",
+    "profile": "Профиль",
+    "killSwitch": "Kill Switch",
+    "autoConnect": "Авто-подключение",
+    "darkTheme": "Тёмная тема",
+    "language": "Язык",
+    "languageRu": "Русский",
+    "languageEn": "English",
+    "upgrade": "Upgrade",
+    "logout": "Выйти из аккаунта",
+    "userFallback": "Пользователь",
+    "pickLanguage": "Выберите язык",
+    "vpnSection": "Настройки VPN",
+    "generalSection": "Основные",
+    "notifications": "Уведомления",
+    "dnsLeak": "Защита от DNS-утечек"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "nav": {
+    "home": "Home",
+    "servers": "Servers",
+    "settings": "Settings"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Sign in to manage your VPN",
+    "registerTitle": "Sign up",
+    "registerSubtitle": "Create your SecureVPN account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "noAccount": "No account? Register",
+    "haveAccount": "Already have an account? Sign in",
+    "fillEmailPassword": "Enter email and password",
+    "fillAllFields": "Fill in all fields",
+    "passwordMismatch": "Passwords do not match",
+    "errorLogin": "Sign-in failed",
+    "errorRegister": "Registration failed"
+  },
+  "main": {
+    "connecting": "Connecting...",
+    "protected": "Protected",
+    "notProtected": "Not protected",
+    "vpnOn": "VPN on",
+    "vpnOff": "VPN off",
+    "connectionStatus": "Connection status",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "currentServer": "Current server",
+    "serverFrankfurt": "Frankfurt, Germany"
+  },
+  "servers": {
+    "title": "Choose server",
+    "searchPlaceholder": "Search by country or city...",
+    "premium": "Premium",
+    "ping": "{{ms}} ms",
+    "frankfurt": {
+      "city": "Frankfurt",
+      "country": "Germany"
+    },
+    "newyork": {
+      "city": "New York",
+      "country": "USA"
+    },
+    "london": {
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    "tokyo": {
+      "city": "Tokyo",
+      "country": "Japan"
+    },
+    "paris": {
+      "city": "Paris",
+      "country": "France"
+    },
+    "singapore": {
+      "city": "Singapore",
+      "country": "Singapore"
+    }
+  },
+  "premium": {
+    "title": "VPN Premium",
+    "plan1m": "1 month",
+    "plan6m": "6 months",
+    "plan12m": "12 months",
+    "perMonth1": "$12.99/mo",
+    "perMonth6": "$9.99/mo",
+    "perMonth12": "$7.49/mo",
+    "savings23": "23% off",
+    "savings42": "42% off",
+    "feat1": "Unlimited traffic",
+    "feat2": "Access to all servers",
+    "feat3": "Priority support",
+    "feat4": "Up to 10 devices at once",
+    "cta": "Start 7-day free trial"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Account and app preferences",
+    "profile": "Profile",
+    "killSwitch": "Kill switch",
+    "autoConnect": "Auto-connect",
+    "darkTheme": "Dark appearance",
+    "language": "Language",
+    "languageRu": "Русский",
+    "languageEn": "English",
+    "upgrade": "Upgrade",
+    "logout": "Log out",
+    "userFallback": "User",
+    "pickLanguage": "Choose language",
+    "vpnSection": "VPN settings",
+    "generalSection": "General",
+    "notifications": "Notifications",
+    "dnsLeak": "DNS leak protection"
+  }
+}

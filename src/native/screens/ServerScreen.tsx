@@ -4,29 +4,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import BottomNav from "../components/BottomNav";
 import { ScreenName } from "../../../App";
-import type { VpnServerId } from "../api/client";
+import type { VpnServer } from "../store/useVpnStore";
 import { useAppTheme } from "../theme/ThemeContext";
-
-interface ServerRow {
-  id: VpnServerId;
-  ping: number;
-}
-
-const SERVER_ROWS: ServerRow[] = [
-  { id: "fra1", ping: 18 },
-  { id: "ams2", ping: 32 },
-  { id: "syd1", ping: 178 },
-];
 
 interface ServerScreenProps {
   onNavigate: (screen: ScreenName) => void;
-  selectedServerId: VpnServerId;
-  onSelectServer: (serverId: VpnServerId) => Promise<void>;
+  servers: VpnServer[];
+  selectedServer: VpnServer | null;
+  onSelectServer: (serverId: string) => Promise<void>;
 }
 
 export default function ServerScreen({
   onNavigate,
-  selectedServerId,
+  servers,
+  selectedServer,
   onSelectServer,
 }: ServerScreenProps) {
   const { t } = useTranslation();
@@ -52,13 +43,9 @@ export default function ServerScreen({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return SERVER_ROWS;
-    return SERVER_ROWS.filter((row) => {
-      const city = t(`servers.${row.id}.city`).toLowerCase();
-      const country = t(`servers.${row.id}.country`).toLowerCase();
-      return city.includes(q) || country.includes(q);
-    });
-  }, [query, t]);
+    if (!q) return servers;
+    return servers.filter((server) => server.name.toLowerCase().includes(q));
+  }, [query, servers]);
 
   return (
     <Animated.View
@@ -95,7 +82,7 @@ export default function ServerScreen({
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => {
-          const isSelected = item.id === selectedServerId;
+          const isSelected = item.id === selectedServer?.id;
           return (
             <Pressable
               onPress={() => {
@@ -110,14 +97,13 @@ export default function ServerScreen({
             >
               <View>
                 <Text style={[styles.city, { color: colors.text }]}>
-                  {`${t(`servers.${item.id}.flag`)} ${t(`servers.${item.id}.city`)}`}
-                </Text>
-                <Text style={[styles.country, { color: colors.textSecondary }]}>
-                  {t(`servers.${item.id}.country`)}
+                  {`${item.flag} ${item.name}`}
                 </Text>
               </View>
               <View style={styles.right}>
-                <Text style={[styles.ping, { color: colors.success }]}>{t("servers.ping", { ms: item.ping })}</Text>
+                <Text style={[styles.ping, { color: colors.success }]}>
+                  {t("servers.ping", { ms: getPingByServerId(item.id) })}
+                </Text>
               </View>
             </Pressable>
           );
@@ -164,7 +150,14 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   city: { fontSize: 16, fontWeight: "600" },
-  country: { fontSize: 12, marginTop: 2 },
   right: { alignItems: "flex-end" },
   ping: { fontSize: 12 },
 });
+
+function getPingByServerId(serverId: string): number {
+  let hash = 0;
+  for (let i = 0; i < serverId.length; i += 1) {
+    hash = (hash * 31 + serverId.charCodeAt(i)) % 180;
+  }
+  return 20 + hash;
+}

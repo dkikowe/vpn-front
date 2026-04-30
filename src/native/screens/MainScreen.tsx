@@ -11,12 +11,9 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import BottomNav from "../components/BottomNav";
 import { ScreenName } from "../../../App";
-import {
-  ApiHttpError,
-  fetchVpnConfigRequest,
-  type VpnServerId,
-} from "../api/client";
+import { ApiHttpError, fetchVpnConfigRequest } from "../api/client";
 import { getToken } from "../auth/tokenStorage";
+import { useVpnStore } from "../store/useVpnStore";
 import { useAppTheme } from "../theme/ThemeContext";
 import type { WireGuardNativeConfig } from "../vpn/parseWireGuardIni";
 
@@ -29,9 +26,9 @@ type WireGuardClient = {
 const IPV6_PLACEHOLDER_ADDRESS = "fd00::50/128";
 const IPV6_DEFAULT_ROUTE = "::/0";
 
-function patchWireGuardConfigForIos<T extends WireGuardNativeConfig & Record<string, unknown>>(
-  config: T,
-): T {
+function patchWireGuardConfigForIos<
+  T extends WireGuardNativeConfig & Record<string, unknown>,
+>(config: T): T {
   const nextAddress = config.address?.trim()
     ? config.address.includes(IPV6_PLACEHOLDER_ADDRESS)
       ? config.address
@@ -57,19 +54,18 @@ const WireGuardVpn: WireGuardClient = (() => {
 
 interface MainScreenProps {
   onNavigate: (screen: ScreenName) => void;
-  selectedServerId: VpnServerId;
   connected: boolean;
   onConnectionChange: (connected: boolean) => void;
 }
 
 export default function MainScreen({
   onNavigate,
-  selectedServerId,
   connected,
   onConnectionChange,
 }: MainScreenProps) {
   const { t } = useTranslation();
   const { colors } = useAppTheme();
+  const { servers, selectedServer, subscriptionKey } = useVpnStore();
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState("");
   const [wgReady, setWgReady] = useState(false);
@@ -158,8 +154,11 @@ export default function MainScreen({
       if (!wgReady) {
         throw new Error(t("main.vpnNotReady"));
       }
-      const token = await getToken();
-      const vpnConfig = await fetchVpnConfigRequest(selectedServerId, token);
+      if (!selectedServer) {
+        throw new Error(t("main.noServerSelected"));
+      }
+      const token = subscriptionKey || (await getToken());
+      const vpnConfig = await fetchVpnConfigRequest(selectedServer.id, token);
       const patchedVpnConfig = patchWireGuardConfigForIos(vpnConfig);
 
       console.log("VPN config object:", patchedVpnConfig);
@@ -192,6 +191,7 @@ export default function MainScreen({
   const badgeBorder = connected ? `${colors.success}80` : `${colors.error}80`;
   const badgeText = connected ? colors.success : colors.error;
   const vpnLabelColor = connected ? colors.primary : colors.iconInactive;
+  const isEmptyState = servers.length === 0;
 
   return (
     <Animated.View
@@ -204,98 +204,118 @@ export default function MainScreen({
         },
       ]}
     >
-      <View style={styles.topBar}>
-        <View
-          style={[
-            styles.badge,
-            { borderColor: badgeBorder, backgroundColor: colors.surface },
-          ]}
-        >
-          <View style={[styles.badgeDot, { backgroundColor: badgeText }]} />
-          <Text style={{ color: badgeText }}>
-            {connecting
-              ? t("main.connecting")
-              : connected
-                ? t("main.protected")
-                : t("main.notProtected")}
-          </Text>
-        </View>
-        <Text style={{ color: vpnLabelColor }}>
-          {connected ? t("main.vpnOn") : t("main.vpnOff")}
-        </Text>
-      </View>
-
-      <View style={styles.center}>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {t("main.connectionStatus")}
-        </Text>
-        <Text style={[styles.status, { color: statusColor }]}>
-          {connecting
-            ? t("main.connecting")
-            : connected
-              ? t("main.connected")
-              : t("main.disconnected")}
-        </Text>
-        {!!connectError && (
-          <Text style={[styles.error, { color: colors.error }]}>
-            {connectError}
-          </Text>
-        )}
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.connectButton,
-            {
-              backgroundColor: connected
-                ? colors.success
-                : connecting
-                  ? colors.warning
-                  : colors.primary,
-              opacity: connectDisabled ? 0.75 : 1,
-            },
-            pressed && styles.connectButtonPressed,
-          ]}
-          onPress={handleConnect}
-          disabled={connectDisabled}
-        >
-          <Animated.View
-            style={{
-              alignItems: "center",
-              transform: [{ scale: connectPulse }],
-            }}
+      {!isEmptyState && (
+        <View style={styles.topBar}>
+          <View
+            style={[
+              styles.badge,
+              { borderColor: badgeBorder, backgroundColor: colors.surface },
+            ]}
           >
-            <MaterialCommunityIcons
-              name="shield-check"
-              size={54}
-              color="#fff"
-            />
-            <Text style={styles.connectText}>
+            <View style={[styles.badgeDot, { backgroundColor: badgeText }]} />
+            <Text style={{ color: badgeText }}>
               {connecting
-                ? "..."
+                ? t("main.connecting")
                 : connected
-                  ? t("main.disconnect")
-                  : t("main.connect")}
-            </Text>
-          </Animated.View>
-        </Pressable>
-
-        <Pressable
-          style={[
-            styles.serverCard,
-            { borderColor: colors.border, backgroundColor: colors.surface },
-          ]}
-          onPress={() => onNavigate("servers")}
-        >
-          <View>
-            <Text style={[styles.serverLabel, { color: colors.textSecondary }]}>
-              {t("main.currentServer")}
-            </Text>
-            <Text style={[styles.serverValue, { color: colors.text }]}>
-              {`${t(`servers.${selectedServerId}.flag`)} ${t(`servers.${selectedServerId}.city`)}`}
+                  ? t("main.protected")
+                  : t("main.notProtected")}
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.text} />
-        </Pressable>
+          <Text style={{ color: vpnLabelColor }}>
+            {connected ? t("main.vpnOn") : t("main.vpnOff")}
+          </Text>
+        </View>
+      )}
+
+      <View style={styles.center}>
+        {isEmptyState ? (
+          <View style={styles.emptyStateWrap}>
+            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+              {t("main.emptyStateMessage")}
+            </Text>
+            <Pressable
+              style={[styles.addProfileButton, { backgroundColor: colors.primary }]}
+              onPress={() => onNavigate("addProfile")}
+            >
+              <Text style={styles.addProfileButtonText}>{t("main.addProfile")}</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {t("main.connectionStatus")}
+            </Text>
+            <Text style={[styles.status, { color: statusColor }]}>
+              {connecting
+                ? t("main.connecting")
+                : connected
+                  ? t("main.connected")
+                  : t("main.disconnected")}
+            </Text>
+            {!!connectError && (
+              <Text style={[styles.error, { color: colors.error }]}>
+                {connectError}
+              </Text>
+            )}
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.connectButton,
+                {
+                  backgroundColor: connected
+                    ? colors.success
+                    : connecting
+                      ? colors.warning
+                      : colors.primary,
+                  opacity: connectDisabled ? 0.75 : 1,
+                },
+                pressed && styles.connectButtonPressed,
+              ]}
+              onPress={handleConnect}
+              disabled={connectDisabled}
+            >
+              <Animated.View
+                style={{
+                  alignItems: "center",
+                  transform: [{ scale: connectPulse }],
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="shield-check"
+                  size={54}
+                  color="#fff"
+                />
+                <Text style={styles.connectText}>
+                  {connecting
+                    ? "..."
+                    : connected
+                      ? t("main.disconnect")
+                      : t("main.connect")}
+                </Text>
+              </Animated.View>
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.serverCard,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+              ]}
+              onPress={() => onNavigate("servers")}
+            >
+              <View>
+                <Text style={[styles.serverLabel, { color: colors.textSecondary }]}>
+                  {t("main.currentServer")}
+                </Text>
+                <Text style={[styles.serverValue, { color: colors.text }]}>
+                  {selectedServer
+                    ? `${selectedServer.flag} ${selectedServer.name}`
+                    : t("main.noServerSelected")}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.text} />
+            </Pressable>
+          </>
+        )}
       </View>
 
       <BottomNav active="main" onNavigate={onNavigate} />
@@ -360,4 +380,28 @@ const styles = StyleSheet.create({
   },
   serverLabel: { fontSize: 12 },
   serverValue: { marginTop: 2, fontSize: 16 },
+  emptyStateWrap: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: "500",
+    textAlign: "center",
+    lineHeight: 26,
+    marginBottom: 24,
+  },
+  addProfileButton: {
+    minWidth: 220,
+    borderRadius: 16,
+    paddingHorizontal: 22,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  addProfileButtonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "700",
+  },
 });

@@ -42,7 +42,26 @@
     "connectFailed": "Не удалось подключиться к VPN",
     "vpnUnsupported": "WireGuard VPN не поддерживается на этом устройстве",
     "vpnNotReady": "WireGuard ещё не готов, попробуйте снова",
-    "disconnectFailed": "Не удалось отключить VPN"
+    "disconnectFailed": "Не удалось отключить VPN",
+    "noServerSelected": "Сервер не выбран",
+    "emptyStateMessage": "Добро пожаловать. Добавьте профиль конфигурации, чтобы начать пользоваться приложением",
+    "addProfile": "Добавить профиль"
+  },
+  "addProfile": {
+    "title": "Добавить профиль",
+    "subscriptionKeyLabel": "Subscription Key",
+    "subscriptionKeyPlaceholder": "Вставьте subscription key",
+    "loadProfile": "Загрузить профиль",
+    "manualImport": "Ручной импорт конфига",
+    "manualPlaceholder": "[Interface]\nPrivateKey = ...\nAddress = ...\n\n[Peer]\nPublicKey = ...",
+    "cancel": "Отмена",
+    "import": "Импорт",
+    "errors": {
+      "loadFailed": "Не удалось загрузить профиль",
+      "importFailed": "Не удалось импортировать конфиг",
+      "invalidWireGuardKeys": "Вставьте валидный WireGuard конфиг: не найден PrivateKey/PublicKey",
+      "invalidWireGuardEndpoint": "Не удалось извлечь Endpoint или Address из конфига"
+    }
   },
   "servers": {
     "title": "Выбор сервера",

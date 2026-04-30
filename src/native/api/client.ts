@@ -2,6 +2,13 @@ import { API_BASE_URL } from "../config/apiBaseUrl";
 import type { WireGuardNativeConfig } from "../vpn/parseWireGuardIni";
 import type { ApiEnvelope, AuthPayload, AuthUser } from "./types";
 
+export interface ApiVpnServer {
+  id: string;
+  name: string;
+  flag: string;
+  configEndpoint?: string;
+}
+
 export class ApiHttpError extends Error {
   status: number;
 
@@ -11,8 +18,6 @@ export class ApiHttpError extends Error {
     this.status = status;
   }
 }
-
-export type VpnServerId = "fra1" | "ams2" | "syd1";
 
 async function parseJson(res: Response): Promise<unknown> {
   const text = await res.text();
@@ -100,7 +105,7 @@ export async function fetchMeRequest(token: string): Promise<AuthUser> {
 }
 
 export async function fetchVpnConfigRequest(
-  serverId: VpnServerId,
+  serverId: string,
   token?: string | null,
 ): Promise<WireGuardNativeConfig> {
   const headers: Record<string, string> = {
@@ -136,4 +141,46 @@ export async function fetchVpnConfigRequest(
   }
 
   return config;
+}
+
+export async function fetchVpnServersRequest(token: string): Promise<ApiVpnServer[]> {
+  const res = await fetch(`${API_BASE_URL}/api/vpn/servers`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const body = (await parseJson(res)) as
+    | ApiEnvelope<{ servers?: ApiVpnServer[] }>
+    | { servers?: ApiVpnServer[]; message?: string };
+
+  if (!res.ok) {
+    throw new ApiHttpError(
+      res.status,
+      getMessage(body, `Не удалось загрузить список серверов (${res.status})`),
+    );
+  }
+
+  const envelopeBody = body as ApiEnvelope<{ servers?: ApiVpnServer[] }>;
+  const directBody = body as { servers?: ApiVpnServer[] };
+  const servers = envelopeBody.data?.servers ?? directBody.servers;
+  if (!Array.isArray(servers)) {
+    throw new Error(getMessage(body, "Некорректный ответ сервера"));
+  }
+
+  const validServers = servers.filter(
+    (row): row is ApiVpnServer =>
+      typeof row?.id === "string" &&
+      typeof row?.name === "string" &&
+      typeof row?.flag === "string" &&
+      (typeof row?.configEndpoint === "undefined" || typeof row?.configEndpoint === "string"),
+  );
+
+  if (validServers.length === 0) {
+    throw new Error("Сервер не вернул ни одного доступного профиля");
+  }
+
+  return validServers;
 }

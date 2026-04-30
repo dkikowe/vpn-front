@@ -42,7 +42,26 @@
     "connectFailed": "Failed to connect to VPN",
     "vpnUnsupported": "WireGuard VPN is not supported on this device",
     "vpnNotReady": "WireGuard is not ready yet, try again",
-    "disconnectFailed": "Failed to disconnect VPN"
+    "disconnectFailed": "Failed to disconnect VPN",
+    "noServerSelected": "No server selected",
+    "emptyStateMessage": "Welcome. Please add a configuration profile to start using the app",
+    "addProfile": "Add Profile"
+  },
+  "addProfile": {
+    "title": "Add Profile",
+    "subscriptionKeyLabel": "Subscription Key",
+    "subscriptionKeyPlaceholder": "Paste subscription key",
+    "loadProfile": "Load Profile",
+    "manualImport": "Manual Config Import",
+    "manualPlaceholder": "[Interface]\nPrivateKey = ...\nAddress = ...\n\n[Peer]\nPublicKey = ...",
+    "cancel": "Cancel",
+    "import": "Import",
+    "errors": {
+      "loadFailed": "Failed to load profile",
+      "importFailed": "Failed to import config",
+      "invalidWireGuardKeys": "Invalid WireGuard config: missing PrivateKey/PublicKey",
+      "invalidWireGuardEndpoint": "Unable to extract Endpoint or Address from config"
+    }
   },
   "servers": {
     "title": "Choose server",

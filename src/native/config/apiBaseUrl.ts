@@ -8,7 +8,7 @@ import { Platform } from "react-native";
  * - Физическое устройство / прод: задайте EXPO_PUBLIC_API_URL (и при необходимости extra.apiUrl в сборке)
  */
 function defaultDevBaseUrl(): string {
-  return "http://192.168.0.10:3000";
+  return "https://vpn-back-production-ec22.up.railway.app";
 }
 
 const fromExpoExtra = Constants.expoConfig?.extra?.apiUrl as string | undefined;

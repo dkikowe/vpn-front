@@ -7,6 +7,8 @@ import { useAppTheme } from "../theme/ThemeContext";
 
 interface PremiumScreenProps {
   onNavigate: (screen: ScreenName) => void;
+  isAuthenticated: boolean;
+  onRequireAuth: () => void;
 }
 
 const PLANS = [
@@ -17,7 +19,11 @@ const PLANS = [
 
 const FEATURE_KEYS = ["premium.feat1", "premium.feat2", "premium.feat3", "premium.feat4"] as const;
 
-export default function PremiumScreen({ onNavigate }: PremiumScreenProps) {
+export default function PremiumScreen({
+  onNavigate,
+  isAuthenticated,
+  onRequireAuth,
+}: PremiumScreenProps) {
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [selected, setSelected] = useState(2);
@@ -67,7 +73,14 @@ export default function PremiumScreen({ onNavigate }: PremiumScreenProps) {
           ))}
         </View>
 
-        <Pressable style={[styles.cta, { backgroundColor: colors.primary }]}>
+        <Pressable
+          style={[styles.cta, { backgroundColor: colors.primary }]}
+          onPress={() => {
+            if (!isAuthenticated) {
+              onRequireAuth();
+            }
+          }}
+        >
           <Text style={styles.ctaText}>{t("premium.cta")}</Text>
         </Pressable>
       </ScrollView>

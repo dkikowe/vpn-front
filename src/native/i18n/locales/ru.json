@@ -34,36 +34,35 @@
     "connect": "Подключить",
     "disconnect": "Отключить",
     "currentServer": "Текущий сервер",
-    "serverFrankfurt": "Франкфурт, Германия"
+    "serverFrankfurt": "Франкфурт, Германия",
+    "authRequired": "Сессия истекла. Войдите снова",
+    "locationUnavailable": "Локация недоступна",
+    "vpnConflict": "VPN уже активен или сессия в конфликте. Попробуйте позже",
+    "vpnConfigInvalid": "Сервер вернул конфиг в неожиданном формате",
+    "connectFailed": "Не удалось подключиться к VPN",
+    "vpnUnsupported": "WireGuard VPN не поддерживается на этом устройстве",
+    "vpnNotReady": "WireGuard ещё не готов, попробуйте снова",
+    "disconnectFailed": "Не удалось отключить VPN"
   },
   "servers": {
     "title": "Выбор сервера",
     "searchPlaceholder": "Поиск по стране или городу...",
     "premium": "Премиум",
     "ping": "{{ms}} мс",
-    "frankfurt": {
+    "fra1": {
+      "flag": "🇩🇪",
       "city": "Франкфурт",
       "country": "Германия"
     },
-    "newyork": {
-      "city": "Нью-Йорк",
-      "country": "США"
+    "ams2": {
+      "flag": "🇳🇱",
+      "city": "Амстердам",
+      "country": "Нидерланды"
     },
-    "london": {
-      "city": "Лондон",
-      "country": "Великобритания"
-    },
-    "tokyo": {
-      "city": "Токио",
-      "country": "Япония"
-    },
-    "paris": {
-      "city": "Париж",
-      "country": "Франция"
-    },
-    "singapore": {
-      "city": "Сингапур",
-      "country": "Сингапур"
+    "syd1": {
+      "flag": "🇦🇺",
+      "city": "Сидней",
+      "country": "Австралия"
     }
   },
   "premium": {

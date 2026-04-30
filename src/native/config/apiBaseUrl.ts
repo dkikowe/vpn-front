@@ -8,7 +8,7 @@ import { Platform } from "react-native";
  * - Физическое устройство / прод: задайте EXPO_PUBLIC_API_URL (и при необходимости extra.apiUrl в сборке)
  */
 function defaultDevBaseUrl(): string {
-  return Platform.OS === "android" ? "http://10.0.2.2:3000" : "http://localhost:3000";
+  return "http://192.168.0.10:3000";
 }
 
 const fromExpoExtra = Constants.expoConfig?.extra?.apiUrl as string | undefined;

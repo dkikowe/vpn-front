@@ -61,3 +61,7 @@ target 'vpnfrontnative' do
     )
   end
 end
+target 'WGExtension' do
+  inherit! :search_paths
+
+end

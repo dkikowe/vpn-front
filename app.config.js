@@ -11,7 +11,7 @@ module.exports = {
     android: {
       package: "com.anonymous.vpnfrontnative",
     },
-    plugins: ["expo-secure-store", "expo-localization"],
+    plugins: ["expo-secure-store", "expo-localization", "react-native-wireguard-vpn"],
     extra: {
       // Продакшен / устройство в LAN: EXPO_PUBLIC_API_URL=https://api.example.com npx expo start
       apiUrl: process.env.EXPO_PUBLIC_API_URL || undefined,

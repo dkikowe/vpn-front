@@ -34,36 +34,35 @@
     "connect": "Connect",
     "disconnect": "Disconnect",
     "currentServer": "Current server",
-    "serverFrankfurt": "Frankfurt, Germany"
+    "serverFrankfurt": "Frankfurt, Germany",
+    "authRequired": "Session expired. Please sign in again",
+    "locationUnavailable": "Location is unavailable",
+    "vpnConflict": "VPN session conflict. Try again in a moment",
+    "vpnConfigInvalid": "The server returned a VPN config in an unexpected format",
+    "connectFailed": "Failed to connect to VPN",
+    "vpnUnsupported": "WireGuard VPN is not supported on this device",
+    "vpnNotReady": "WireGuard is not ready yet, try again",
+    "disconnectFailed": "Failed to disconnect VPN"
   },
   "servers": {
     "title": "Choose server",
     "searchPlaceholder": "Search by country or city...",
     "premium": "Premium",
     "ping": "{{ms}} ms",
-    "frankfurt": {
+    "fra1": {
+      "flag": "🇩🇪",
       "city": "Frankfurt",
       "country": "Germany"
     },
-    "newyork": {
-      "city": "New York",
-      "country": "USA"
+    "ams2": {
+      "flag": "🇳🇱",
+      "city": "Amsterdam",
+      "country": "Netherlands"
     },
-    "london": {
-      "city": "London",
-      "country": "United Kingdom"
-    },
-    "tokyo": {
-      "city": "Tokyo",
-      "country": "Japan"
-    },
-    "paris": {
-      "city": "Paris",
-      "country": "France"
-    },
-    "singapore": {
-      "city": "Singapore",
-      "country": "Singapore"
+    "syd1": {
+      "flag": "🇦🇺",
+      "city": "Sydney",
+      "country": "Australia"
     }
   },
   "premium": {

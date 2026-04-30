@@ -1,37 +1,54 @@
-import { useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import BottomNav from "../components/BottomNav";
 import { ScreenName } from "../../../App";
+import type { VpnServerId } from "../api/client";
 import { useAppTheme } from "../theme/ThemeContext";
 
-type ServerId = "frankfurt" | "newyork" | "london" | "tokyo" | "paris" | "singapore";
-
 interface ServerRow {
-  id: ServerId;
+  id: VpnServerId;
   ping: number;
-  premium?: boolean;
 }
 
 const SERVER_ROWS: ServerRow[] = [
-  { id: "frankfurt", ping: 18 },
-  { id: "newyork", ping: 92 },
-  { id: "london", ping: 32 },
-  { id: "tokyo", ping: 145 },
-  { id: "paris", ping: 24 },
-  { id: "singapore", ping: 178, premium: true },
+  { id: "fra1", ping: 18 },
+  { id: "ams2", ping: 32 },
+  { id: "syd1", ping: 178 },
 ];
 
 interface ServerScreenProps {
   onNavigate: (screen: ScreenName) => void;
+  selectedServerId: VpnServerId;
+  onSelectServer: (serverId: VpnServerId) => Promise<void>;
 }
 
-export default function ServerScreen({ onNavigate }: ServerScreenProps) {
+export default function ServerScreen({
+  onNavigate,
+  selectedServerId,
+  onSelectServer,
+}: ServerScreenProps) {
   const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState<ServerId>("frankfurt");
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  const slideUp = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeIn, {
+        toValue: 1,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUp, {
+        toValue: 0,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeIn, slideUp]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -44,7 +61,12 @@ export default function ServerScreen({ onNavigate }: ServerScreenProps) {
   }, [query, t]);
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.bg }]}>
+    <Animated.View
+      style={[
+        styles.screen,
+        { backgroundColor: colors.bg, opacity: fadeIn, transform: [{ translateY: slideUp }] },
+      ]}
+    >
       <View style={styles.header}>
         <Pressable onPress={() => onNavigate("main")} hitSlop={8}>
           <Ionicons name="arrow-back" size={22} color={colors.text} />
@@ -73,28 +95,29 @@ export default function ServerScreen({ onNavigate }: ServerScreenProps) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => {
-          const isSelected = item.id === selectedId;
+          const isSelected = item.id === selectedServerId;
           return (
             <Pressable
-              onPress={() => (item.premium ? onNavigate("premium") : setSelectedId(item.id))}
-              style={[
+              onPress={() => {
+                void onSelectServer(item.id);
+              }}
+              style={({ pressed }) => [
                 styles.serverCard,
                 { borderColor: colors.border, backgroundColor: colors.surface },
                 isSelected && { borderColor: colors.primary, backgroundColor: colors.primaryMuted },
-                item.premium && styles.serverCardPremium,
+                pressed && styles.serverCardPressed,
               ]}
             >
               <View>
-                <Text style={[styles.city, { color: colors.text }]}>{t(`servers.${item.id}.city`)}</Text>
+                <Text style={[styles.city, { color: colors.text }]}>
+                  {`${t(`servers.${item.id}.flag`)} ${t(`servers.${item.id}.city`)}`}
+                </Text>
                 <Text style={[styles.country, { color: colors.textSecondary }]}>
                   {t(`servers.${item.id}.country`)}
                 </Text>
               </View>
               <View style={styles.right}>
                 <Text style={[styles.ping, { color: colors.success }]}>{t("servers.ping", { ms: item.ping })}</Text>
-                {item.premium ? (
-                  <Text style={[styles.premiumTag, { color: colors.premium }]}>{t("servers.premium")}</Text>
-                ) : null}
               </View>
             </Pressable>
           );
@@ -102,7 +125,7 @@ export default function ServerScreen({ onNavigate }: ServerScreenProps) {
       />
 
       <BottomNav active="servers" onNavigate={onNavigate} />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -137,10 +160,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  serverCardPremium: { opacity: 0.72 },
+  serverCardPressed: {
+    transform: [{ scale: 0.98 }],
+  },
   city: { fontSize: 16, fontWeight: "600" },
   country: { fontSize: 12, marginTop: 2 },
   right: { alignItems: "flex-end" },
   ping: { fontSize: 12 },
-  premiumTag: { fontSize: 11, marginTop: 4 },
 });

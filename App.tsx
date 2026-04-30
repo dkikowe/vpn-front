@@ -8,10 +8,12 @@ import RegisterScreen from "./src/native/screens/RegisterScreen";
 import ServerScreen from "./src/native/screens/ServerScreen";
 import SettingsScreen from "./src/native/screens/SettingsScreen";
 import type { AuthPayload, AuthUser } from "./src/native/api/types";
+import type { VpnServerId } from "./src/native/api/client";
 import { fetchMeRequest } from "./src/native/api/client";
 import { deleteToken, getToken, saveToken } from "./src/native/auth/tokenStorage";
 import i18n, { loadStoredLanguage } from "./src/native/i18n/i18n";
 import { ThemeProvider, useAppTheme } from "./src/native/theme/ThemeContext";
+import type { WireGuardNativeConfig } from "./src/native/vpn/parseWireGuardIni";
 
 export type ScreenName =
   | "login"
@@ -23,10 +25,24 @@ export type ScreenName =
 
 function AppContent() {
   const { colors } = useAppTheme();
-  const [screen, setScreen] = useState<ScreenName>("login");
+  const [screen, setScreen] = useState<ScreenName>("main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [bootstrapDone, setBootstrapDone] = useState(false);
+  const [selectedServerId, setSelectedServerId] = useState<VpnServerId>("fra1");
+  const [vpnConnected, setVpnConnected] = useState(false);
+  const [authReturnScreen, setAuthReturnScreen] = useState<ScreenName>("premium");
+
+  type WireGuardClient = {
+    disconnect: () => Promise<void>;
+    connect: (config: WireGuardNativeConfig) => Promise<void>;
+    isSupported: () => Promise<boolean>;
+  };
+
+  const WireGuardVpn: WireGuardClient = (() => {
+    const lib = require("react-native-wireguard-vpn");
+    return (lib.default ?? lib) as WireGuardClient;
+  })();
 
   useEffect(() => {
     let cancelled = false;
@@ -55,14 +71,38 @@ function AppContent() {
     await saveToken(payload.token);
     setUser(payload.user);
     setIsAuthenticated(true);
-    setScreen("main");
+    setScreen(authReturnScreen);
   };
 
   const handleLogout = async () => {
     await deleteToken();
     setUser(null);
     setIsAuthenticated(false);
+    setScreen("main");
+  };
+
+  const requireAuthFor = (target: ScreenName) => {
+    if (isAuthenticated) {
+      setScreen(target);
+      return;
+    }
+    setAuthReturnScreen(target);
     setScreen("login");
+  };
+
+  const handleServerSelect = async (serverId: VpnServerId) => {
+    if (serverId === selectedServerId) return;
+
+    if (vpnConnected) {
+      try {
+        await WireGuardVpn.disconnect();
+      } catch (e) {
+        console.warn("Failed to stop VPN before server switch:", e);
+      }
+    }
+
+    setSelectedServerId(serverId);
+    setVpnConnected(false);
   };
 
   if (!bootstrapDone) {
@@ -80,24 +120,36 @@ function AppContent() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
       <StatusBar barStyle={colors.statusBarStyle === "light" ? "light-content" : "dark-content"} />
       <View style={styles.container}>
-        {!isAuthenticated ? (
-          <>
-            {screen === "login" && (
-              <LoginScreen onLogin={handleAuthSuccess} onGoToRegister={() => setScreen("register")} />
-            )}
-            {screen === "register" && (
-              <RegisterScreen onRegister={handleAuthSuccess} onGoToLogin={() => setScreen("login")} />
-            )}
-          </>
-        ) : (
-          <>
-            {screen === "main" && <MainScreen onNavigate={setScreen} />}
-            {screen === "servers" && <ServerScreen onNavigate={setScreen} />}
-            {screen === "premium" && <PremiumScreen onNavigate={setScreen} />}
-            {screen === "settings" && (
-              <SettingsScreen user={user} onNavigate={setScreen} onLogout={handleLogout} />
-            )}
-          </>
+        {screen === "login" && (
+          <LoginScreen onLogin={handleAuthSuccess} onGoToRegister={() => setScreen("register")} />
+        )}
+        {screen === "register" && (
+          <RegisterScreen onRegister={handleAuthSuccess} onGoToLogin={() => setScreen("login")} />
+        )}
+        {screen === "main" && (
+          <MainScreen
+            onNavigate={setScreen}
+            selectedServerId={selectedServerId}
+            connected={vpnConnected}
+            onConnectionChange={setVpnConnected}
+          />
+        )}
+        {screen === "servers" && (
+          <ServerScreen
+            onNavigate={setScreen}
+            selectedServerId={selectedServerId}
+            onSelectServer={handleServerSelect}
+          />
+        )}
+        {screen === "premium" && (
+          <PremiumScreen
+            onNavigate={setScreen}
+            isAuthenticated={isAuthenticated}
+            onRequireAuth={() => requireAuthFor("premium")}
+          />
+        )}
+        {screen === "settings" && (
+          <SettingsScreen user={user} onNavigate={setScreen} onLogout={handleLogout} />
         )}
       </View>
     </SafeAreaView>

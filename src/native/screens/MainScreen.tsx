@@ -161,6 +161,9 @@ export default function MainScreen({
       const vpnConfig = await fetchVpnConfigRequest(selectedServer.id, token);
       const patchedVpnConfig = patchWireGuardConfigForIos(vpnConfig);
 
+      (patchedVpnConfig as any).appGroup = "group.com.didar.vpntest";
+      (patchedVpnConfig as any).extensionBundleId =
+        "com.didar.vpntest.WGExtension";
       console.log("VPN config object:", patchedVpnConfig);
       await WireGuardVpn.connect(patchedVpnConfig);
       onConnectionChange(true);
@@ -230,14 +233,21 @@ export default function MainScreen({
       <View style={styles.center}>
         {isEmptyState ? (
           <View style={styles.emptyStateWrap}>
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
+            <Text
+              style={[styles.emptyStateText, { color: colors.textSecondary }]}
+            >
               {t("main.emptyStateMessage")}
             </Text>
             <Pressable
-              style={[styles.addProfileButton, { backgroundColor: colors.primary }]}
+              style={[
+                styles.addProfileButton,
+                { backgroundColor: colors.primary },
+              ]}
               onPress={() => onNavigate("addProfile")}
             >
-              <Text style={styles.addProfileButtonText}>{t("main.addProfile")}</Text>
+              <Text style={styles.addProfileButtonText}>
+                {t("main.addProfile")}
+              </Text>
             </Pressable>
           </View>
         ) : (
@@ -303,7 +313,9 @@ export default function MainScreen({
               onPress={() => onNavigate("servers")}
             >
               <View>
-                <Text style={[styles.serverLabel, { color: colors.textSecondary }]}>
+                <Text
+                  style={[styles.serverLabel, { color: colors.textSecondary }]}
+                >
                   {t("main.currentServer")}
                 </Text>
                 <Text style={[styles.serverValue, { color: colors.text }]}>

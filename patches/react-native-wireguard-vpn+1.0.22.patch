@@ -1,3 +1,11 @@
+diff --git a/node_modules/react-native-wireguard-vpn/.DS_Store b/node_modules/react-native-wireguard-vpn/.DS_Store
+new file mode 100644
+index 0000000..36d39ae
+Binary files /dev/null and b/node_modules/react-native-wireguard-vpn/.DS_Store differ
+diff --git a/node_modules/react-native-wireguard-vpn/ios/.DS_Store b/node_modules/react-native-wireguard-vpn/ios/.DS_Store
+new file mode 100644
+index 0000000..092c233
+Binary files /dev/null and b/node_modules/react-native-wireguard-vpn/ios/.DS_Store differ
 diff --git a/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.h b/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.h
 index 46a3488..a8c3043 100644
 --- a/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.h
@@ -15,116 +23,412 @@ index 46a3488..a8c3043 100644
  @interface WireGuardVpn : RCTEventEmitter <RCTBridgeModule>
  @end 
 diff --git a/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.m b/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.m
-index 426514b..ed5872e 100644
+deleted file mode 100644
+index 426514b..0000000
 --- a/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.m
-+++ b/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.m
-@@ -1,8 +1,10 @@
- #import "WireGuardVpn.h"
- #import <NetworkExtension/NetworkExtension.h>
-+#include <sys/types.h>
- 
- @implementation WireGuardVpn {
-   id _neStatusObserver;
-+  BOOL _hasListeners;
- }
- 
- RCT_EXPORT_MODULE(WireGuardVpnModule)
-@@ -15,6 +17,7 @@ RCT_EXPORT_MODULE(WireGuardVpnModule)
- // RN will call these when JS starts/stops listening to events.
- - (void)startObserving
- {
-+  _hasListeners = YES;
-   if (_neStatusObserver != nil) return;
- 
-   __weak typeof(self) weakSelf = self;
-@@ -29,6 +32,7 @@ RCT_EXPORT_MODULE(WireGuardVpnModule)
- 
- - (void)stopObserving
- {
-+  _hasListeners = NO;
-   if (_neStatusObserver == nil) return;
-   [[NSNotificationCenter defaultCenter] removeObserver:_neStatusObserver];
-   _neStatusObserver = nil;
-@@ -36,9 +40,9 @@ RCT_EXPORT_MODULE(WireGuardVpnModule)
- 
- - (void)emitVpnStateChanged
- {
++++ /dev/null
+@@ -1,294 +0,0 @@
+-#import "WireGuardVpn.h"
+-#import <NetworkExtension/NetworkExtension.h>
+-
+-@implementation WireGuardVpn {
+-  id _neStatusObserver;
+-}
+-
+-RCT_EXPORT_MODULE(WireGuardVpnModule)
+-
+-- (NSArray<NSString *> *)supportedEvents
+-{
+-  return @[@"vpnStateChanged"];
+-}
+-
+-// RN will call these when JS starts/stops listening to events.
+-- (void)startObserving
+-{
+-  if (_neStatusObserver != nil) return;
+-
+-  __weak typeof(self) weakSelf = self;
+-  _neStatusObserver = [[NSNotificationCenter defaultCenter]
+-      addObserverForName:NEVPNStatusDidChangeNotification
+-                  object:nil
+-                   queue:[NSOperationQueue mainQueue]
+-              usingBlock:^(NSNotification * _Nonnull note) {
+-                [weakSelf emitVpnStateChanged];
+-              }];
+-}
+-
+-- (void)stopObserving
+-{
+-  if (_neStatusObserver == nil) return;
+-  [[NSNotificationCenter defaultCenter] removeObserver:_neStatusObserver];
+-  _neStatusObserver = nil;
+-}
+-
+-- (void)emitVpnStateChanged
+-{
 -  if (![self hasListeners]) return;
-+  if (!_hasListeners) return;
- 
+-
 -  NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
-+  NSString *providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
-   [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
-     if (error || managers == nil) return;
- 
-@@ -129,7 +133,7 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)config
-       return;
-     }
-     
+-  [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+-    if (error || managers == nil) return;
+-
+-    NETunnelProviderManager *manager = nil;
+-    for (NETunnelProviderManager *m in managers) {
+-      if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) continue;
+-      NETunnelProviderProtocol *p = (NETunnelProviderProtocol *)m.protocolConfiguration;
+-      if ([p.providerBundleIdentifier isEqualToString:providerBundleIdentifier]) {
+-        manager = m;
+-        break;
+-      }
+-    }
+-
+-    if (!manager) return;
+-
+-    NEVPNStatus status = manager.connection.status;
+-    NSString *tunnelState = [self stringFromVPNStatus:status];
+-
+-    NSString *simpleStatus = nil;
+-    if (status == NEVPNStatusConnected) simpleStatus = @"CONNECTED";
+-    else if (status == NEVPNStatusDisconnected) simpleStatus = @"DISCONNECTED";
+-    else if (status == NEVPNStatusConnecting) simpleStatus = @"CONNECTING";
+-    else if (status == NEVPNStatusDisconnecting) simpleStatus = @"DISCONNECTING";
+-    else if (status == NEVPNStatusInvalid) simpleStatus = @"ERROR";
+-    else simpleStatus = @"UNKNOWN";
+-
+-    NSDictionary *body = @{
+-      @"isConnected": @((status == NEVPNStatusConnected) ? YES : NO),
+-      @"tunnelState": tunnelState ?: @"UNKNOWN",
+-      @"status": simpleStatus ?: @"UNKNOWN"
+-    };
+-
+-    [self sendEventWithName:@"vpnStateChanged" body:body];
+-  }];
+-}
+-
+-RCT_EXPORT_METHOD(initialize:(RCTPromiseResolveBlock)resolve
+-                  rejecter:(RCTPromiseRejectBlock)reject)
+-{
+-  [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+-    if (error) {
+-      reject(@"INIT_ERROR", error.localizedDescription, error);
+-      return;
+-    }
+-    
+-    NETunnelProviderManager *manager = managers.firstObject ?: [[NETunnelProviderManager alloc] init];
+-    manager.localizedDescription = @"WireGuard VPN";
+-    manager.protocolConfiguration = [[NETunnelProviderProtocol alloc] init];
+-    
+-    [manager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+-      if (error) {
+-        reject(@"INIT_ERROR", error.localizedDescription, error);
+-        return;
+-      }
+-      resolve(nil);
+-    }];
+-  }];
+-}
+-
+-RCT_EXPORT_METHOD(connect:(NSDictionary *)config
+-                  resolver:(RCTPromiseResolveBlock)resolve
+-                  rejecter:(RCTPromiseRejectBlock)reject)
+-{
+-  // Validate required config early for clearer errors.
+-  NSString *serverAddress = config[@"serverAddress"];
+-  id serverPort = config[@"serverPort"];
+-  NSString *privateKey = config[@"privateKey"];
+-  NSString *publicKey = config[@"publicKey"];
+-  id allowedIPs = config[@"allowedIPs"];
+-
+-  BOOL hasRequired =
+-      (serverAddress && ![serverAddress isKindOfClass:[NSNull class]]) &&
+-      (privateKey && ![privateKey isKindOfClass:[NSNull class]]) &&
+-      (publicKey && ![publicKey isKindOfClass:[NSNull class]]) &&
+-      serverPort &&
+-      (allowedIPs && [allowedIPs isKindOfClass:[NSArray class]] && [(NSArray *)allowedIPs count] > 0);
+-
+-  if (!hasRequired) {
+-    reject(@"CONNECT_ERROR",
+-           @"Missing required config: serverAddress, serverPort, privateKey, publicKey, allowedIPs (non-empty array)",
+-           nil);
+-    return;
+-  }
+-
+-  [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+-    if (error) {
+-      reject(@"CONNECT_ERROR", error.localizedDescription, error);
+-      return;
+-    }
+-    
 -    NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
-+    NSString *providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
- 
-     // Pick the correct NETunnelProviderManager (do not assume firstObject).
-     NETunnelProviderManager *manager = nil;
-@@ -166,6 +170,17 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)config
-     tunnelConfig[@"allowedIPs"] = config[@"allowedIPs"];
-     tunnelConfig[@"dns"] = config[@"dns"];
-     tunnelConfig[@"mtu"] = config[@"mtu"];
-+    tunnelConfig[@"address"] = config[@"address"];
-+    tunnelConfig[@"jc"] = [NSString stringWithFormat:@"%@", config[@"jc"]];
-+    tunnelConfig[@"jmin"] = [NSString stringWithFormat:@"%@", config[@"jmin"]];
-+    tunnelConfig[@"jmax"] = [NSString stringWithFormat:@"%@", config[@"jmax"]];
-+    tunnelConfig[@"s1"] = [NSString stringWithFormat:@"%@", config[@"s1"]];
-+    tunnelConfig[@"s2"] = [NSString stringWithFormat:@"%@", config[@"s2"]];
-+    tunnelConfig[@"h1"] = [NSString stringWithFormat:@"%@", config[@"h1"]];
-+    tunnelConfig[@"h2"] = [NSString stringWithFormat:@"%@", config[@"h2"]];
-+    tunnelConfig[@"h3"] = [NSString stringWithFormat:@"%@", config[@"h3"]];
-+    tunnelConfig[@"h4"] = [NSString stringWithFormat:@"%@", config[@"h4"]];
-+
-     
-     protocol.providerConfiguration = tunnelConfig;
- 
-@@ -177,15 +192,18 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)config
-         return;
-       }
-       
+-
+-    // Pick the correct NETunnelProviderManager (do not assume firstObject).
+-    NETunnelProviderManager *manager = nil;
+-    for (NETunnelProviderManager *m in managers) {
+-      if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) {
+-        continue;
+-      }
+-      NETunnelProviderProtocol *p = (NETunnelProviderProtocol *)m.protocolConfiguration;
+-      if ([p.providerBundleIdentifier isEqualToString:providerBundleIdentifier]) {
+-        manager = m;
+-        break;
+-      }
+-    }
+-    if (!manager) {
+-      manager = [[NETunnelProviderManager alloc] init];
+-    }
+-
+-    manager.enabled = YES;
+-
+-    NETunnelProviderProtocol *protocol = nil;
+-    if ([manager.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) {
+-      protocol = (NETunnelProviderProtocol *)manager.protocolConfiguration;
+-    } else {
+-      protocol = [[NETunnelProviderProtocol alloc] init];
+-    }
+-
+-    protocol.serverAddress = config[@"serverAddress"];
+-    protocol.providerBundleIdentifier = providerBundleIdentifier;
+-    
+-    NSMutableDictionary *tunnelConfig = [NSMutableDictionary dictionary];
+-    tunnelConfig[@"privateKey"] = config[@"privateKey"];
+-    tunnelConfig[@"publicKey"] = config[@"publicKey"];
+-    tunnelConfig[@"serverPort"] = config[@"serverPort"];
+-    tunnelConfig[@"allowedIPs"] = config[@"allowedIPs"];
+-    tunnelConfig[@"dns"] = config[@"dns"];
+-    tunnelConfig[@"mtu"] = config[@"mtu"];
+-    
+-    protocol.providerConfiguration = tunnelConfig;
+-
+-    manager.protocolConfiguration = protocol;
+-
+-    [manager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+-      if (error) {
+-        reject(@"CONNECT_ERROR", error.localizedDescription, error);
+-        return;
+-      }
+-      
 -      NSError *startError;
 -      [manager.connection startVPNTunnelAndReturnError:&startError];
-+      // --- ХАК: Загружаем настройки перед стартом ---
-+      [manager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable loadError) {
-+        NSError *startError;
-+        [manager.connection startVPNTunnelAndReturnError:&startError];
-         
+-      
 -      if (startError) {
 -        reject(@"CONNECT_ERROR", startError.localizedDescription, startError);
 -        return;
 -      }
-+        if (startError) {
-+          reject(@"CONNECT_ERROR", startError.localizedDescription, startError);
-+          return;
-+        }
-         
+-      
 -      resolve(nil);
+-    }];
+-  }];
+-}
+-
+-RCT_EXPORT_METHOD(disconnect:(RCTPromiseResolveBlock)resolve
+-                  rejecter:(RCTPromiseRejectBlock)reject)
+-{
+-  [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+-    if (error) {
+-      reject(@"DISCONNECT_ERROR", error.localizedDescription, error);
+-      return;
+-    }
+-    
+-    NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
+-    NETunnelProviderManager *manager = nil;
+-    for (NETunnelProviderManager *m in managers) {
+-      if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) continue;
+-      NETunnelProviderProtocol *p = (NETunnelProviderProtocol *)m.protocolConfiguration;
+-      if ([p.providerBundleIdentifier isEqualToString:providerBundleIdentifier]) {
+-        manager = m;
+-        break;
+-      }
+-    }
+-    
+-    if (!manager) {
+-      resolve(nil);
+-      return;
+-    }
+-
+-    [manager.connection stopVPNTunnel];
+-    resolve(nil);
+-  }];
+-}
+-
+-RCT_EXPORT_METHOD(getStatus:(RCTPromiseResolveBlock)resolve
+-                  rejecter:(RCTPromiseRejectBlock)reject)
+-{
+-  [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+-    if (error) {
+-      reject(@"STATUS_ERROR", error.localizedDescription, error);
+-      return;
+-    }
+-    
+-    NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
+-    NETunnelProviderManager *manager = nil;
+-    for (NETunnelProviderManager *m in managers) {
+-      if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) continue;
+-      NETunnelProviderProtocol *p = (NETunnelProviderProtocol *)m.protocolConfiguration;
+-      if ([p.providerBundleIdentifier isEqualToString:providerBundleIdentifier]) {
+-        manager = m;
+-        break;
+-      }
+-    }
+-
+-    if (!manager) {
+-      resolve(@{
+-        @"isConnected": @NO,
+-        @"tunnelState": @"INACTIVE",
+-        @"status": @"DISCONNECTED",
+-      });
+-      return;
+-    }
+-
+-    NEVPNStatus status = manager.connection.status;
+-    NSString *tunnelState = [self stringFromVPNStatus:status];
+-    NSString *simpleStatus = nil;
+-    if (status == NEVPNStatusConnected) simpleStatus = @"CONNECTED";
+-    else if (status == NEVPNStatusDisconnected) simpleStatus = @"DISCONNECTED";
+-    else if (status == NEVPNStatusConnecting) simpleStatus = @"CONNECTING";
+-    else if (status == NEVPNStatusDisconnecting) simpleStatus = @"DISCONNECTING";
+-    else if (status == NEVPNStatusInvalid) simpleStatus = @"ERROR";
+-    else simpleStatus = @"UNKNOWN";
+-
+-    resolve(@{
+-      @"isConnected": @(status == NEVPNStatusConnected),
+-      @"tunnelState": tunnelState,
+-      @"status": simpleStatus
+-    });
+-  }];
+-}
+-
+-RCT_EXPORT_METHOD(isSupported:(RCTPromiseResolveBlock)resolve
+-                  rejecter:(RCTPromiseRejectBlock)reject)
+-{
+-  resolve(@YES);
+-}
+-
+-- (NSString *)stringFromVPNStatus:(NEVPNStatus)status
+-{
+-  switch (status) {
+-    case NEVPNStatusConnected:
+-      return @"ACTIVE";
+-    case NEVPNStatusConnecting:
+-      return @"CONNECTING";
+-    case NEVPNStatusDisconnecting:
+-      return @"DISCONNECTING";
+-    case NEVPNStatusDisconnected:
+-      return @"INACTIVE";
+-    case NEVPNStatusInvalid:
+-      return @"ERROR";
+-    default:
+-      return @"UNKNOWN";
+-  }
+-}
+-
+-@end 
+\ No newline at end of file
+diff --git a/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.mm b/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.mm
+new file mode 100644
+index 0000000..0e001db
+--- /dev/null
++++ b/node_modules/react-native-wireguard-vpn/ios/WireGuardVpn.mm
+@@ -0,0 +1,102 @@
++#include <sys/types.h>
++#include <stdint.h>
++#import "WireGuardVpn.h"
++#import <NetworkExtension/NetworkExtension.h>
++
++@implementation WireGuardVpn {
++    id _neStatusObserver;
++    BOOL _hasListeners;
++}
++
++RCT_EXPORT_MODULE(WireGuardVpnModule)
++
++- (NSArray<NSString *> *)supportedEvents {
++    return @[@"vpnStateChanged"];
++}
++
++// 1. Чистая инициализация
++RCT_EXPORT_METHOD(initialize:(RCTPromiseResolveBlock)resolve
++                  rejecter:(RCTPromiseRejectBlock)reject)
++{
++    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
++        NETunnelProviderManager *manager = managers.count > 0 ? managers.firstObject : [[NETunnelProviderManager alloc] init];
++        
++        NETunnelProviderProtocol *protocol = [[NETunnelProviderProtocol alloc] init];
++        protocol.providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
++        protocol.serverAddress = @"46.101.242.165"; // Ставим реальный IP сразу
++        
++        manager.protocolConfiguration = protocol;
++        manager.localizedDescription = @"WireGuard VPN";
++        manager.enabled = YES;
++        
++        [manager saveToPreferencesWithCompletionHandler:^(NSError *saveError) {
++            if (saveError) {
++                reject(@"INIT_ERROR", saveError.localizedDescription, saveError);
++            } else {
++                resolve(nil);
++            }
++        }];
++    }];
++}
++
++// 2. Метод коннекта с принудительной перезаписью адреса
++RCT_EXPORT_METHOD(connect:(NSDictionary *)config
++                  resolver:(RCTPromiseResolveBlock)resolve
++                  rejecter:(RCTPromiseRejectBlock)reject)
++{
++    NSString *ip = [NSString stringWithFormat:@"%@", config[@"serverAddress"]];
++    
++    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
++        NETunnelProviderManager *manager = managers.count > 0 ? managers.firstObject : [[NETunnelProviderManager alloc] init];
++        
++        NETunnelProviderProtocol *protocol = [[NETunnelProviderProtocol alloc] init];
++        protocol.providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
++        protocol.serverAddress = ip; // <--- ВОТ ТУТ СИСТЕМА ЕГО ЖДЕТ
++        
++        // Упаковываем конфиг для Swift
++        NSMutableDictionary *tunnelConfig = [NSMutableDictionary dictionaryWithDictionary:config];
++        // Гарантируем, что всё — строки
++        for (NSString *key in config) {
++            if (![key isEqualToString:@"allowedIPs"] && ![key isEqualToString:@"dns"]) {
++                tunnelConfig[key] = [NSString stringWithFormat:@"%@", config[key]];
++            }
++        }
++        
++        protocol.providerConfiguration = tunnelConfig;
++        manager.protocolConfiguration = protocol;
++        manager.enabled = YES;
++        
++        [manager saveToPreferencesWithCompletionHandler:^(NSError *saveError) {
++            if (saveError) {
++                NSLog(@"[CRITICAL] Save error: %@", saveError.localizedDescription);
++                reject(@"CONNECT_ERROR", saveError.localizedDescription, saveError);
++                return;
++            }
++            
++            [manager loadFromPreferencesWithCompletionHandler:^(NSError *loadError) {
++                NSError *startError;
++                BOOL success = [manager.connection startVPNTunnelAndReturnError:&startError];
++                if (!success) {
++                    reject(@"CONNECT_ERROR", startError.localizedDescription, startError);
++                } else {
++                    resolve(nil);
++                }
++            }];
++        }];
++    }];
++}
++
++RCT_EXPORT_METHOD(disconnect:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
++    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
++        for (NETunnelProviderManager *m in managers) {
++            [m.connection stopVPNTunnel];
++        }
 +        resolve(nil);
-+      }];
-     }];
-   }];
- }
-@@ -199,7 +217,7 @@ RCT_EXPORT_METHOD(disconnect:(RCTPromiseResolveBlock)resolve
-       return;
-     }
-     
--    NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
-+    NSString *providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
-     NETunnelProviderManager *manager = nil;
-     for (NETunnelProviderManager *m in managers) {
-       if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) continue;
-@@ -229,7 +247,7 @@ RCT_EXPORT_METHOD(getStatus:(RCTPromiseResolveBlock)resolve
-       return;
-     }
-     
--    NSString *providerBundleIdentifier = @"com.wireguardvpn.tunnel";
-+    NSString *providerBundleIdentifier = @"com.didar.vpntest.WGExtension";
-     NETunnelProviderManager *manager = nil;
-     for (NETunnelProviderManager *m in managers) {
-       if (![m.protocolConfiguration isKindOfClass:[NETunnelProviderProtocol class]]) continue;
++    }];
++}
++
++RCT_EXPORT_METHOD(isSupported:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
++    resolve(@YES);
++}
++
++@end
+\ No newline at end of file

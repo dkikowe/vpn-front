@@ -29,21 +29,19 @@ const IPV6_DEFAULT_ROUTE = "::/0";
 function patchWireGuardConfigForIos<
   T extends WireGuardNativeConfig & Record<string, unknown>,
 >(config: T): T {
+  // Оставляем фейковый IPv6 адрес, чтобы iOS (Apple) не ругалась и пропускала билд
   const nextAddress = config.address?.trim()
     ? config.address.includes(IPV6_PLACEHOLDER_ADDRESS)
       ? config.address
       : `${config.address}, ${IPV6_PLACEHOLDER_ADDRESS}`
     : IPV6_PLACEHOLDER_ADDRESS;
 
-  const allowedIPs = config.allowedIPs ?? [];
-  const nextAllowedIPs = allowedIPs.includes(IPV6_DEFAULT_ROUTE)
-    ? allowedIPs
-    : [...allowedIPs, IPV6_DEFAULT_ROUTE];
-
+  // УБРАЛИ добавление "::/0" в маршруты.
+  // Теперь телефон не будет пытаться грузить IPv6-трафик через туннель.
   return {
     ...config,
     address: nextAddress,
-    allowedIPs: nextAllowedIPs,
+    allowedIPs: config.allowedIPs ?? [],
   };
 }
 

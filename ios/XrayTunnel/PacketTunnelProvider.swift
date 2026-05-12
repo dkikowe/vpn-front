@@ -50,9 +50,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             
             // 4. ЗАПУСКАЕМ ЯДРО
-            DispatchQueue.global(qos: .userInitiated).async {
-                LibXrayRunXray(xrayJson)
-            }
+          DispatchQueue.global(qos: .userInitiated).async {
+                          let err = LibXrayRunXray(xrayJson)
+                          print("❌ XRAY КРАШНУЛСЯ ИЛИ ОСТАНОВИЛСЯ: \(String(describing: err))")
+                          // Если Xray упал, вырубаем тумблер в iOS, чтобы не было "черной дыры"
+                          self.cancelTunnelWithError(NSError(domain: "Xray", code: 1, userInfo: nil))
+                      }
             
             completionHandler(nil)
         }

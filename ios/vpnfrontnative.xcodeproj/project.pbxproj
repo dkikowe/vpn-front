@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,11 @@
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		AA144B702FA28A7900FBC8CD /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA144B6F2FA28A7900FBC8CD /* WireGuardKit */; };
 		AA144B7C2FA295A500FBC8CD /* libwg-go.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA144B7B2FA295A500FBC8CD /* libwg-go.a */; };
+		AA3BF7322FAE5013008F1459 /* XrayTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA3BF7292FAE5013008F1459 /* XrayTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA3BF73E2FAE5347008F1459 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AA3BF73D2FAE5347008F1459 /* libresolv.tbd */; };
+		AA3BF7452FAE82D0008F1459 /* XrayVpnModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BF7412FAE7FA5008F1459 /* XrayVpnModule.swift */; };
+		AA3BF7482FAE84DB008F1459 /* XrayVpnModule.m in Sources */ = {isa = PBXBuildFile; fileRef = AA3BF7462FAE84DB008F1459 /* XrayVpnModule.m */; };
+		AA3BF7532FB213FC008F1459 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB74A822F9C343400BC1D63 /* NetworkExtension.framework */; };
 		AAB74A832F9C343400BC1D63 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB74A822F9C343400BC1D63 /* NetworkExtension.framework */; };
 		AAB74A8B2F9C343400BC1D63 /* WGExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAB74A812F9C343400BC1D63 /* WGExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
@@ -21,6 +26,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		AA3BF7302FAE5013008F1459 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA3BF7282FAE5013008F1459;
+			remoteInfo = XrayTunnel;
+		};
 		AAB74A892F9C343400BC1D63 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
@@ -37,6 +49,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				AA3BF7322FAE5013008F1459 /* XrayTunnel.appex in Embed Foundation Extensions */,
 				AAB74A8B2F9C343400BC1D63 /* WGExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -56,6 +69,11 @@
 		A2040171669042AACDD21A93 /* Pods-WGExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WGExtension.debug.xcconfig"; path = "Target Support Files/Pods-WGExtension/Pods-WGExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		AA144B7B2FA295A500FBC8CD /* libwg-go.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libwg-go.a"; path = "Sources/WireGuardKitGo/out/libwg-go.a"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = vpnfrontnative/SplashScreen.storyboard; sourceTree = "<group>"; };
+		AA3BF7292FAE5013008F1459 /* XrayTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = XrayTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA3BF73D2FAE5347008F1459 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		AA3BF7412FAE7FA5008F1459 /* XrayVpnModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XrayVpnModule.swift; sourceTree = "<group>"; };
+		AA3BF7442FAE809F008F1459 /* vpnfrontnative-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vpnfrontnative-Bridging-Header.h"; sourceTree = "<group>"; };
+		AA3BF7462FAE84DB008F1459 /* XrayVpnModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XrayVpnModule.m; sourceTree = "<group>"; };
 		AA524A332F9EC8250089AE4F /* vpnfrontnative.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vpnfrontnative.entitlements; sourceTree = "<group>"; };
 		AAB74A812F9C343400BC1D63 /* WGExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WGExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB74A822F9C343400BC1D63 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
@@ -68,6 +86,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA3BF7352FAE5013008F1459 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA3BF7282FAE5013008F1459 /* XrayTunnel */;
+		};
 		AAB74A8F2F9C343400BC1D63 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -78,6 +103,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		AA3BF72B2FAE5013008F1459 /* XrayTunnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AA3BF7352FAE5013008F1459 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = XrayTunnel; sourceTree = "<group>"; };
 		AAB74A842F9C343400BC1D63 /* WGExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (AAB74A8F2F9C343400BC1D63 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = WGExtension; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -87,6 +113,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC06994E705637B27952DBCD /* libPods-vpnfrontnative.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA3BF7262FAE5013008F1459 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA3BF7532FB213FC008F1459 /* NetworkExtension.framework in Frameworks */,
+				AA3BF73E2FAE5347008F1459 /* libresolv.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +156,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA3BF73D2FAE5347008F1459 /* libresolv.tbd */,
 				AA144B7B2FA295A500FBC8CD /* libwg-go.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				AAB74A822F9C343400BC1D63 /* NetworkExtension.framework */,
@@ -167,9 +203,13 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				AA3BF7462FAE84DB008F1459 /* XrayVpnModule.m */,
+				AA3BF7442FAE809F008F1459 /* vpnfrontnative-Bridging-Header.h */,
+				AA3BF7412FAE7FA5008F1459 /* XrayVpnModule.swift */,
 				13B07FAE1A68108700A75B9A /* vpnfrontnative */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				AAB74A842F9C343400BC1D63 /* WGExtension */,
+				AA3BF72B2FAE5013008F1459 /* XrayTunnel */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				7DC6F48AA4A799A798BA08B0 /* Pods */,
@@ -185,6 +225,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* vpnfrontnative.app */,
 				AAB74A812F9C343400BC1D63 /* WGExtension.appex */,
+				AA3BF7292FAE5013008F1459 /* XrayTunnel.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -219,11 +260,34 @@
 			);
 			dependencies = (
 				AAB74A8A2F9C343400BC1D63 /* PBXTargetDependency */,
+				AA3BF7312FAE5013008F1459 /* PBXTargetDependency */,
 			);
 			name = vpnfrontnative;
 			productName = vpnfrontnative;
 			productReference = 13B07F961A680F5B00A75B9A /* vpnfrontnative.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AA3BF7282FAE5013008F1459 /* XrayTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA3BF7362FAE5013008F1459 /* Build configuration list for PBXNativeTarget "XrayTunnel" */;
+			buildPhases = (
+				AA3BF7252FAE5013008F1459 /* Sources */,
+				AA3BF7262FAE5013008F1459 /* Frameworks */,
+				AA3BF7272FAE5013008F1459 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA3BF72B2FAE5013008F1459 /* XrayTunnel */,
+			);
+			name = XrayTunnel;
+			packageProductDependencies = (
+			);
+			productName = XrayTunnel;
+			productReference = AA3BF7292FAE5013008F1459 /* XrayTunnel.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		AAB74A802F9C343400BC1D63 /* WGExtension */ = {
 			isa = PBXNativeTarget;
@@ -259,6 +323,9 @@
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1250;
 					};
+					AA3BF7282FAE5013008F1459 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					AAB74A802F9C343400BC1D63 = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -282,6 +349,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* vpnfrontnative */,
 				AAB74A802F9C343400BC1D63 /* WGExtension */,
+				AA3BF7282FAE5013008F1459 /* XrayTunnel */,
 			);
 		};
 /* End PBXProject section */
@@ -295,6 +363,13 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				238C8AB4E20AA5D7C28DC516 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA3BF7272FAE5013008F1459 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,8 +517,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA3BF7482FAE84DB008F1459 /* XrayVpnModule.m in Sources */,
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				AA3BF7452FAE82D0008F1459 /* XrayVpnModule.swift in Sources */,
 				2814595BFCFB360B4157303B /* ExpoModulesProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA3BF7252FAE5013008F1459 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -457,6 +541,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		AA3BF7312FAE5013008F1459 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA3BF7282FAE5013008F1459 /* XrayTunnel */;
+			targetProxy = AA3BF7302FAE5013008F1459 /* PBXContainerItemProxy */;
+		};
 		AAB74A8A2F9C343400BC1D63 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AAB74A802F9C343400BC1D63 /* WGExtension */;
@@ -496,7 +585,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.didar.vpntest;
 				PRODUCT_NAME = vpnfrontnative;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "vpnfrontnative/vpnfrontnative-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dkikowe/Desktop/vpn-front/ios/vpnfrontnative-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -530,7 +619,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.didar.vpntest;
 				PRODUCT_NAME = vpnfrontnative;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "vpnfrontnative/vpnfrontnative-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dkikowe/Desktop/vpn-front/ios/vpnfrontnative-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -598,6 +687,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dkikowe/Desktop/vpn-front/ios/vpnfrontnative-Bridging-Header.h";
 				USE_HERMES = true;
 			};
 			name = Debug;
@@ -655,8 +745,93 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/dkikowe/Desktop/vpn-front/ios/vpnfrontnative-Bridging-Header.h";
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA3BF7332FAE5013008F1459 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = XrayTunnel/XrayTunnel.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XrayTunnel/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XrayTunnel;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.didar.vpntest.XrayTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA3BF7342FAE5013008F1459 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = XrayTunnel/XrayTunnel.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XrayTunnel/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XrayTunnel;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.didar.vpntest.XrayTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -936,6 +1111,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA3BF7362FAE5013008F1459 /* Build configuration list for PBXNativeTarget "XrayTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA3BF7332FAE5013008F1459 /* Debug */,
+				AA3BF7342FAE5013008F1459 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

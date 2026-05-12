@@ -11,17 +11,24 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import BottomNav from "../components/BottomNav";
 import { ScreenName } from "../../../App";
-import { ApiHttpError, fetchVpnConfigRequest } from "../api/client";
+import {
+  ApiHttpError,
+  fetchVlessConfigRequest,
+  fetchVpnConfigRequest,
+} from "../api/client";
 import { getToken } from "../auth/tokenStorage";
 import { useVpnStore } from "../store/useVpnStore";
 import { useAppTheme } from "../theme/ThemeContext";
 import type { WireGuardNativeConfig } from "../vpn/parseWireGuardIni";
+import { XrayClient } from "../vpn/XrayClient";
 
 type WireGuardClient = {
   isSupported: () => Promise<boolean>;
   connect: (config: WireGuardNativeConfig) => Promise<void>;
   disconnect: () => Promise<void>;
 };
+
+type VpnProtocol = "wireguard" | "vless";
 
 const IPV6_PLACEHOLDER_ADDRESS = "fd00::50/128";
 const IPV6_DEFAULT_ROUTE = "::/0";
@@ -67,6 +74,10 @@ export default function MainScreen({
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState("");
   const [wgReady, setWgReady] = useState(false);
+  const [protocol, setProtocol] = useState<VpnProtocol>("wireguard");
+  const [activeProtocol, setActiveProtocol] = useState<VpnProtocol | null>(
+    null,
+  );
   const fadeIn = useRef(new Animated.Value(0)).current;
   const slideUp = useRef(new Animated.Value(20)).current;
   const connectPulse = useRef(new Animated.Value(1)).current;
@@ -136,8 +147,13 @@ export default function MainScreen({
   const handleConnect = async () => {
     if (connected) {
       try {
-        await WireGuardVpn.disconnect();
+        if (activeProtocol === "vless") {
+          await XrayClient.disconnect();
+        } else {
+          await WireGuardVpn.disconnect();
+        }
         onConnectionChange(false);
+        setActiveProtocol(null);
         setConnectError("");
       } catch (e) {
         const msg = e instanceof Error ? e.message : t("main.disconnectFailed");
@@ -149,22 +165,42 @@ export default function MainScreen({
     setConnecting(true);
 
     try {
-      if (!wgReady) {
+      if (protocol === "wireguard" && !wgReady) {
         throw new Error(t("main.vpnNotReady"));
       }
-      if (!selectedServer) {
+      if (protocol === "wireguard" && !selectedServer) {
         throw new Error(t("main.noServerSelected"));
       }
       const token = subscriptionKey || (await getToken());
-      const vpnConfig = await fetchVpnConfigRequest(selectedServer.id, token);
-      const patchedVpnConfig = patchWireGuardConfigForIos(vpnConfig);
+      if (!token) {
+        throw new Error(t("main.authRequired"));
+      }
 
-      (patchedVpnConfig as any).appGroup = "group.com.didar.vpntest";
-      (patchedVpnConfig as any).extensionBundleId =
-        "com.didar.vpntest.WGExtension";
-      console.log("VPN config object:", patchedVpnConfig);
-      await WireGuardVpn.connect(patchedVpnConfig);
+      if (protocol === "vless") {
+        // Запрашиваем наш новый JSON конфиг
+        const xrayConfig = await fetchVlessConfigRequest(token);
+        console.log("XRAY КОНФИГ С БЭКЕНДА:", xrayConfig);
+        await XrayClient.connect(xrayConfig);
+      } else {
+        const wireGuardServer = selectedServer;
+        if (!wireGuardServer) {
+          throw new Error(t("main.noServerSelected"));
+        }
+        const vpnConfig = await fetchVpnConfigRequest(
+          wireGuardServer.id,
+          token,
+        );
+        const patchedVpnConfig = patchWireGuardConfigForIos(vpnConfig);
+
+        (patchedVpnConfig as any).appGroup = "group.com.didar.vpntest";
+        (patchedVpnConfig as any).extensionBundleId =
+          "com.didar.vpntest.WGExtension";
+        console.log("VPN config object:", patchedVpnConfig);
+        await WireGuardVpn.connect(patchedVpnConfig);
+      }
       onConnectionChange(true);
+      setActiveProtocol(protocol);
+      setConnectError("");
     } catch (e) {
       const msg = (() => {
         if (e instanceof ApiHttpError) {
@@ -183,7 +219,8 @@ export default function MainScreen({
     }
   };
 
-  const connectDisabled = connecting || (!connected && !wgReady);
+  const connectDisabled =
+    connecting || (!connected && protocol === "wireguard" && !wgReady);
   const statusColor = connecting
     ? colors.warning
     : connected
@@ -265,6 +302,42 @@ export default function MainScreen({
                 {connectError}
               </Text>
             )}
+
+            <View
+              style={[
+                styles.protocolSwitch,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+              ]}
+            >
+              {(["wireguard", "vless"] as const).map((item) => {
+                const selected = protocol === item;
+                return (
+                  <Pressable
+                    key={item}
+                    style={[
+                      styles.protocolTab,
+                      selected && { backgroundColor: colors.primary },
+                      (connecting || connected) && styles.protocolTabDisabled,
+                    ]}
+                    onPress={() => setProtocol(item)}
+                    disabled={connecting || connected}
+                  >
+                    <Text
+                      style={[
+                        styles.protocolTabText,
+                        { color: selected ? "#fff" : colors.text },
+                      ]}
+                    >
+                      {t(
+                        item === "wireguard"
+                          ? "main.protocolWireGuard"
+                          : "main.protocolVless",
+                      )}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
 
             <Pressable
               style={({ pressed }) => [
@@ -366,6 +439,31 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     textAlign: "center",
     paddingHorizontal: 10,
+  },
+  protocolSwitch: {
+    width: "100%",
+    borderRadius: 18,
+    borderWidth: 1,
+    flexDirection: "row",
+    padding: 4,
+    marginBottom: 22,
+    gap: 4,
+  },
+  protocolTab: {
+    flex: 1,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  protocolTabDisabled: {
+    opacity: 0.8,
+  },
+  protocolTabText: {
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
   },
   connectButton: {
     width: 220,

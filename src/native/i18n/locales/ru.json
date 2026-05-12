@@ -33,6 +33,8 @@
     "disconnected": "Отключено",
     "connect": "Подключить",
     "disconnect": "Отключить",
+    "protocolWireGuard": "WireGuard (Быстрый)",
+    "protocolVless": "VLESS (Анти-блок)",
     "currentServer": "Текущий сервер",
     "serverFrankfurt": "Франкфурт, Германия",
     "authRequired": "Сессия истекла. Войдите снова",

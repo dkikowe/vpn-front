@@ -33,6 +33,8 @@
     "disconnected": "Disconnected",
     "connect": "Connect",
     "disconnect": "Disconnect",
+    "protocolWireGuard": "WireGuard (Fast)",
+    "protocolVless": "VLESS (Anti-block)",
     "currentServer": "Current server",
     "serverFrankfurt": "Frankfurt, Germany",
     "authRequired": "Session expired. Please sign in again",

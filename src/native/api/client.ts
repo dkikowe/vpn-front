@@ -143,6 +143,43 @@ export async function fetchVpnConfigRequest(
   return config;
 }
 
+export async function fetchVlessConfigRequest(token: string): Promise<string> {
+  const res = await fetch(`${API_BASE_URL}/api/vpn/vless/config`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  
+  // 🟢 1. Меняем типы: теперь ожидаем xrayConfig вместо vlessUrl
+  const body = (await parseJson(res)) as ApiEnvelope<{ xrayConfig?: string }> & {
+    xrayConfig?: string;
+    message?: string;
+  };
+
+  if (!res.ok) {
+    throw new ApiHttpError(
+      res.status,
+      getMessage(body, `Не удалось получить VLESS конфиг (${res.status})`),
+    );
+  }
+  if (body.success === false) {
+    throw new Error(getMessage(body, "Не удалось получить VLESS конфиг"));
+  }
+
+  // 🟢 2. Достаем xrayConfig из ответа
+  const xrayConfig = body.data?.xrayConfig ?? body.xrayConfig;
+  
+  // 🟢 3. Проверяем, что конфиг пришел
+  if (typeof xrayConfig !== "string" || !xrayConfig.trim()) {
+    throw new Error(getMessage(body, "Сервер вернул пустой Xray конфиг"));
+  }
+
+  // 🟢 4. Возвращаем JSON-строку для нашего нативного модуля
+  return xrayConfig;
+}
+
 export async function fetchVpnServersRequest(token: string): Promise<ApiVpnServer[]> {
   const res = await fetch(`${API_BASE_URL}/api/vpn/servers`, {
     method: "GET",

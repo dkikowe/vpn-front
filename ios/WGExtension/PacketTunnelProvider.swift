@@ -71,7 +71,12 @@ public class PacketTunnelProvider: NEPacketTunnelProvider {
             peer.persistentKeepAlive = 25
           
             let allowedIPsStr = (providerConfig["allowedIPs"] as? [String])?.joined(separator: ", ") ?? "0.0.0.0/0, ::/0"
-            peer.allowedIPs = allowedIPsStr.components(separatedBy: ",").compactMap { IPAddressRange(from: $0.trimmingCharacters(in: .whitespaces)) }
+            let allowedIPEntries = allowedIPsStr
+                .components(separatedBy: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+            peer.allowedIPs = allowedIPEntries.compactMap { IPAddressRange(from: $0) }
+            let hasIPv6AllowedIPs = allowedIPEntries.contains { $0.contains(":") }
           
             let tunnelConfig = TunnelConfiguration(name: "Amnezia", interface: interface, peers: [peer])
           
@@ -84,7 +89,7 @@ public class PacketTunnelProvider: NEPacketTunnelProvider {
             networkSettings.ipv4Settings = ipv4Settings
           
             let ipv6Addresses = addressComponents.filter { $0.contains(":") }.map { $0.components(separatedBy: "/").first ?? $0 }
-            if !ipv6Addresses.isEmpty {
+            if hasIPv6AllowedIPs && !ipv6Addresses.isEmpty {
                 let ipv6Settings = NEIPv6Settings(addresses: ipv6Addresses, networkPrefixLengths: ipv6Addresses.map { _ in 128 })
                 ipv6Settings.includedRoutes = [NEIPv6Route.default()]
                 networkSettings.ipv6Settings = ipv6Settings
